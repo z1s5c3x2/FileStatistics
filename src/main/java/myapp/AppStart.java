@@ -18,7 +18,6 @@ public class AppStart {
 
         System.out.println("1월 ~ 12월 입력 >> ");
         ReadController.getInstance().getFile(sc.nextLine());
-
         //while (true)
         /*
         *  기능구현 1.

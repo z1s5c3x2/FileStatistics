@@ -24,23 +24,16 @@ public class ReadService {
     public static ReadService getInstance() {return instance;}
     private ReadService() {};
 
-    private static final int START_ROW = 16;
-    private Scanner sc = new Scanner(System.in);
-
     public  void getFile(String _month)
     {
         initFiledata(_month);
     }
     private void initFiledata(String _month)
     {
-
-
         System.out.println(_month+"파일 접근,데이터 초기화");
         ClassPathResource cpr = new ClassPathResource(_month+".xlsx");
         FileDataDto fileDataDto = searchRow(cpr);
-
         System.out.println("fileDataDto = " + fileDataDto);
-
         System.out.println("스레드풀 초기화");
         ExecutorService threadPool = new ThreadPoolExecutor(
                 3, // 코어 스레드 개수
@@ -68,12 +61,11 @@ public class ReadService {
             List<Future<Void>> futures = threadPool.invokeAll(tasks);
             /*System.out.println("fileDataDto = " + fileDataDto.getRowList().get(20000).toString());
             System.out.println("fileDataDto.getRowList().size() = " + fileDataDto.getRowList().size());*/
+            System.out.println(fileDataDto.getRowList().size());
             writeLogFromExcel(fileDataDto);
-
-
         }catch (Exception e)
         {
-            System.out.println("_month = " + _month);
+            System.out.println("_month = " + e);
         }
     }
     private void writeLogFromExcel(FileDataDto fileDataDto)
@@ -82,13 +74,21 @@ public class ReadService {
         Map<String,Integer> saveData = new HashMap<>();
         for(ExcelDataDto _dto : fileDataDto.getRowList())
         {
-            String _add = _dto.getAddress1().split(" ")[1];
+            /*String _add = _dto.getAddress1().split(" ")[1];
             if(!saveData.containsKey(_add))
             {
                 saveData.put(_add,1);
             }else
             {
                 saveData.put(_add,saveData.get(_add)+1);
+            }*/
+
+            String city = KmpSearch.getInstance().kmpSearch(_dto.getAddress1());
+            if(!saveData.containsKey(city))
+            {
+                saveData.put(city,1);
+            }else {
+                saveData.put(city, saveData.get(city) + 1);
             }
 
         }
@@ -96,7 +96,14 @@ public class ReadService {
         Workbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("test1");
 
-        int nowRow = 0;
+        int nowRow = 1;
+        Row initrow = sheet.createRow(0);
+        // 지역
+        Cell initcell = initrow.createCell(0);
+        initcell.setCellValue("지역");
+        // 거래량
+        initcell = initrow.createCell(1);
+        initcell.setCellValue("거래수");
         for(Map.Entry<String,Integer> _map : saveData.entrySet())
         {
 
@@ -123,13 +130,12 @@ public class ReadService {
     }
     private void readFile(FileDataDto fdt,int start,int end)
     {
-        int asd = 0;
         try {
             System.out.println(", start = " + start + ", end = " + end);
             for(int nowRow = start;nowRow<=end;nowRow++)
             {
                 Row row = fdt.getSheet().getRow(nowRow);
-                asd = nowRow;
+
                 if(row == null) break;
                 fdt.getRowList().add(new ExcelDataDto().rowToDto(row));
 
