@@ -16,8 +16,16 @@ public class AppStart {
         System.out.println(Paths.get("").toAbsolutePath().toString());
         //초기 스레드수 설정 5
 
-        System.out.println("1월 ~ 12월 입력 >> ");
-        ReadController.getInstance().getFile(sc.nextLine());
+        System.out.println("1. n월 조회 2.최근 1년 조회");
+        if(sc.nextInt()==1)
+        {
+            System.out.println("1월 ~ 12월 입력 >> ");
+            sc.nextLine();
+            ReadController.getInstance().getFile(sc.nextLine(),"month");
+        }else {
+            ReadController.getInstance().getFile(null,"year");
+        }
+
         //while (true)
         /*
         *  기능구현 1.

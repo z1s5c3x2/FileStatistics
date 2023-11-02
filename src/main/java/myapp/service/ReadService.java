@@ -24,12 +24,46 @@ public class ReadService {
     public static ReadService getInstance() {return instance;}
     private ReadService() {};
 
-    public  void getFile(String _month)
+    public  void getFile(String _month,String getType)
     {
-        initFiledata(_month);
+        if(getType.equals("month"))
+        {
+            writeLogFromExcelToMonth(initFiledata(_month));
+        }else {
+            HashMap<String,FileDataDto> fileDataDtos = new HashMap<>();
+            ExecutorService threadPool = new ThreadPoolExecutor(
+                    12, // 코어 스레드 개수
+                    12, // 최대 스레드 개수
+                    120L, // 최대 놀 수 있는 시간 (이 시간 넘으면 스레드 풀에서 쫓겨 남.)
+                    TimeUnit.SECONDS, // 놀 수 있는 시간 단위
+                    new ArrayBlockingQueue<Runnable>(24)
+            );
+            List<Callable<Void>> tasks = new ArrayList<>();
+
+            for(int i=1;i<=12;i++)
+            {
+                String _mon = i+"월";
+                Callable<Void> task = ()->{
+                    fileDataDtos.put(_mon,initFiledata(_mon));
+
+                    return null;
+                };
+                tasks.add(task);
+            }
+            try{
+                List<Future<Void>> futures = threadPool.invokeAll(tasks);
+                System.out.println("fileDataDtos 1m= " + fileDataDtos.get("1월").getRowList().size());
+                System.out.println("fileDataDtos 2m= " + fileDataDtos.get("2월").getRowList().size());
+                writeLogFromExcelToYear(fileDataDtos);
+            }catch(Exception e) {
+                System.out.println("getFile" + e);
+            }
+
+        }
     }
-    private void initFiledata(String _month)
+    private FileDataDto initFiledata(String _month)
     {
+        System.out.println("_month = " + _month);
         System.out.println(_month+"파일 접근,데이터 초기화");
         ClassPathResource cpr = new ClassPathResource(_month+".xlsx");
         FileDataDto fileDataDto = searchRow(cpr);
@@ -59,30 +93,55 @@ public class ReadService {
         }
         try {
             List<Future<Void>> futures = threadPool.invokeAll(tasks);
-            /*System.out.println("fileDataDto = " + fileDataDto.getRowList().get(20000).toString());
-            System.out.println("fileDataDto.getRowList().size() = " + fileDataDto.getRowList().size());*/
-            System.out.println(fileDataDto.getRowList().size());
-            writeLogFromExcel(fileDataDto);
+            System.out.println("성공");
+            return fileDataDto;
         }catch (Exception e)
         {
-            System.out.println("_month = " + e);
+            System.out.println("init 에러 = " + e);
         }
+        return null;
     }
-    private void writeLogFromExcel(FileDataDto fileDataDto)
+    private void writeLogFromExcelToYear(HashMap<String,FileDataDto> stringFileDataDtoHashMap)
+    {
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("year");
+        
+        
+        Row initRow = sheet.createRow(0);
+        Cell initCell = initRow.createCell(0);
+        initCell.setCellValue("월");
+        initCell = initRow.createCell(1);
+        initCell.setCellValue("거래량");
+        initCell = initRow.createCell(2);
+        initCell.setCellValue("변동폭");
+        for(int i=1;i<=12;i++)
+        {
+            Row row = sheet.createRow(i);
+            Cell cell = row.createCell(0);
+            cell.setCellValue(i+"월");
+            cell = row.createCell(1);
+            cell.setCellValue(stringFileDataDtoHashMap.get(i+"월").getRowList().size());
+            cell = row.createCell(2);
+            cell.setCellValue("변동폭");
+        }
+        try {
+            FileOutputStream out = new FileOutputStream("src\\main\\resources\\lastyearhview.xlsx");
+            wb.write(out);
+            out.flush();
+            System.out.println("저장 성공");
+            wb.close();
+        }catch (Exception e)
+        {
+            System.out.println("e = " + e);
+        }
+        
+    }
+    private void writeLogFromExcelToMonth(FileDataDto fileDataDto)
     {
         // 주소 분리,거래량 저장
         Map<String,Integer> saveData = new HashMap<>();
         for(ExcelDataDto _dto : fileDataDto.getRowList())
         {
-            /*String _add = _dto.getAddress1().split(" ")[1];
-            if(!saveData.containsKey(_add))
-            {
-                saveData.put(_add,1);
-            }else
-            {
-                saveData.put(_add,saveData.get(_add)+1);
-            }*/
-
             String city = KmpSearch.getInstance().kmpSearch(_dto.getAddress1());
             if(!saveData.containsKey(city))
             {
@@ -90,11 +149,10 @@ public class ReadService {
             }else {
                 saveData.put(city, saveData.get(city) + 1);
             }
-
         }
-
+        saveData.remove("X");
         Workbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet("test1");
+        Sheet sheet = wb.createSheet("data");
 
         int nowRow = 1;
         Row initrow = sheet.createRow(0);
@@ -117,7 +175,7 @@ public class ReadService {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream("D:\\download\\testfile.xlsx");
+            FileOutputStream out = new FileOutputStream("src\\main\\resources\\lastmonthview.xlsx");
             wb.write(out);
             out.flush();
             System.out.println("저장 성공");

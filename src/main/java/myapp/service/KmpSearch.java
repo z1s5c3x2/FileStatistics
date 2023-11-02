@@ -42,7 +42,7 @@ public class KmpSearch {
                 return __city;
             }
         }
-        return "작은곳?";
+        return "X";
     }
 
     private int[] getPi(String pattern) {

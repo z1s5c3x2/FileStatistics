@@ -8,8 +8,8 @@ public class ReadController {
     public static ReadController getInstance() {return instance;}
     private ReadController() {};
 
-    public void getFile(String fileName)
+    public void getFile(String fileName,String getType)
     {
-        ReadService.getInstance().getFile(fileName);
+        ReadService.getInstance().getFile(fileName,getType);
     }
 }
