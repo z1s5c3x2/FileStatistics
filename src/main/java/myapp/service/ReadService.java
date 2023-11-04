@@ -1,6 +1,7 @@
 package myapp.service;
 
 import myapp.model.ExcelDataDto;
+import myapp.model.ExcelReadOnlyDto;
 import myapp.model.FileDataDto;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
@@ -39,12 +40,14 @@ public class ReadService {
                     new ArrayBlockingQueue<Runnable>(24)
             );
             List<Callable<Void>> tasks = new ArrayList<>();
-
+            List<List<List<String>>> asd = new ArrayList<>();
             for(int i=1;i<=12;i++)
             {
                 String _mon = i+"월";
                 Callable<Void> task = ()->{
-                    fileDataDtos.put(_mon,initFiledata(_mon));
+
+                    asd.add(new ExcelReadOnlyDto().initFile(new ClassPathResource(_mon+".xlsx").getFile()).getRows());
+                    //fileDataDtos.put(_mon,initFiledata(_mon));
 
                     return null;
                 };
@@ -52,9 +55,15 @@ public class ReadService {
             }
             try{
                 List<Future<Void>> futures = threadPool.invokeAll(tasks);
-                System.out.println("fileDataDtos 1m= " + fileDataDtos.get("1월").getRowList().size());
-                System.out.println("fileDataDtos 2m= " + fileDataDtos.get("2월").getRowList().size());
-                writeLogFromExcelToYear(fileDataDtos);
+                /*System.out.println("fileDataDtos 1m= " + fileDataDtos.get("1월").getRowList().size());
+                System.out.println("fileDataDtos 2m= " + fileDataDtos.get("2월").getRowList().size());*/
+                //writeLogFromExcelToYear(fileDataDtos);
+                int getFullSize = 0;
+                for(List<List<String>> _list : asd)
+                {   
+                    getFullSize += _list.size();
+                }
+                System.out.println("getFullSize = " + getFullSize);
             }catch(Exception e) {
                 System.out.println("getFile" + e);
             }
