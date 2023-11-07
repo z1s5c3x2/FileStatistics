@@ -186,8 +186,8 @@ public class ReadService {
             if(i != 1)
             {
                 int nowMonthSize =  stringFileDataDtoHashMap.get(i+"월").getRowList().size();
-                int postMonthSize = stringFileDataDtoHashMap.get((i-1)+"월").getRowList().size();
-                changePercent = String.format("%.2f",(nowMonthSize-postMonthSize)/(float)postMonthSize*100)+"%";
+                int preMonthSize = stringFileDataDtoHashMap.get((i-1)+"월").getRowList().size();
+                changePercent = String.format("%.2f",(nowMonthSize-preMonthSize)/(float)preMonthSize*100)+"%";
             }
             cell.setCellValue(changePercent);
         }
