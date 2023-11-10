@@ -95,6 +95,7 @@ public class ReadService {
             
             XSSFSheet sheet = wb.getSheetAt(0);
             wb.close();
+            cpr.getInputStream().close();
 
             ExecutorService threadPool = new ThreadPoolExecutor(
                     3, // 코어 스레드 개수
@@ -118,6 +119,7 @@ public class ReadService {
             }
             threadPool.invokeAll(tasks);
             threadPool.shutdown();
+            tasks.clear();
             return fileDataDto;
         } catch (Exception e) {
             System.out.println("initFiledata" + e);

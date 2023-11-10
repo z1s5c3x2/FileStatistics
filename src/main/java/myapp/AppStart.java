@@ -2,6 +2,7 @@ package myapp;
 
 import myapp.Controller.ReadController;
 import myapp.service.ReadService;
+import myapp.view.MenuView;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 import java.nio.file.Paths;
@@ -13,19 +14,11 @@ import java.util.Scanner;
 import java.util.concurrent.*;
 
 public class AppStart {
-    private static Scanner sc = new Scanner(System.in);
-    public static void main(String[] args) {
-        while(true) {
-            System.out.println("1. 개별 월단위 조회 2.최근 1년 조회");
-            if (sc.nextInt() == 1) {
-                System.out.println("(2022-11 ~ 2023-10 ) 입력 \n(예시 : 2023-04 ) >> ");
-                sc.nextLine();
-                ReadController.getInstance().getFile(sc.nextLine() , "month");
-            } else {
-                ReadController.getInstance().getFile(null , "year");
-            }
-        }
 
+    public static void main(String[] args) {
+        MenuView.getInstance().selectMenu();;
+    }
+}
         //while (true)
         /*
         *  기능구현 1.
@@ -48,5 +41,5 @@ public class AppStart {
 
         }*/
 
-    }
-}
+
+

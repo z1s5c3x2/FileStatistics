@@ -80,7 +80,7 @@ public class WriteService {
             }
         }
         saveData.remove("X");
-        Workbook wb = new XSSFWorkbook();
+        XSSFWorkbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("data");
 
         int nowRow = 1;
@@ -106,6 +106,7 @@ public class WriteService {
             FileOutputStream out = new FileOutputStream("src\\main\\resources\\"+ fileName+ "조회.xlsx");
             wb.write(out);
             out.flush();
+            out.close();
             System.out.println("저장 성공");
             wb.close();
         } catch (Exception e) {
