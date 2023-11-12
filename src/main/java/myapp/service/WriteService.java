@@ -11,8 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class WriteService {
 
@@ -67,7 +66,49 @@ public class WriteService {
         }
 
     }
+    public Map<String,Float> choiceCityInMere(HashMap<String, FileDataDto> stringFileDataDtoHashMap,String target)
+    {
+        //System.out.println("target = " + target);
+        HashMap<String,int[]> mereCount = new HashMap<>();
+        HashMap<String,Float> mereInfo = new HashMap<>();
 
+        for(Map.Entry<String,FileDataDto> entry : stringFileDataDtoHashMap.entrySet())
+        {
+            for(ExcelDataDto _dto : entry.getValue().getRowList())
+            {
+                String _city =KmpSearch.getInstance().kmpSearch(_dto.getAddress1());
+                if(_city.equals(target))
+                {
+                    String _mere = _dto.getMereName();
+                    if(!mereInfo.containsKey(_mere))
+                    {
+                        mereInfo.put(_mere,_dto.getAreaSize());
+                        mereCount.put(_mere, new int[]{1, _dto.getAmount()});
+                    }else{
+                        int[] _cityData =mereCount.get(_mere);
+                        _cityData[0] ++;
+                        _cityData[1] += _dto.getAmount();
+                        mereCount.put(_mere,_cityData);
+                    }
+                }
+            }
+        }
+        HashMap<String,Float> result = new HashMap<>();
+        for(Map.Entry<String,int[]> entry : mereCount.entrySet())
+        {
+            int[] _tmp = entry.getValue();
+            float _res = ( (float) _tmp[1] /_tmp[0] )/mereInfo.get(entry.getKey());
+            result.put(entry.getKey(),_res);
+        }
+        LinkedHashMap<String,Float> rankSort = result.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(LinkedHashMap::new,
+                        (m, e) -> m.put(e.getKey(), e.getValue()),
+                        LinkedHashMap::putAll);
+
+        // 정렬된 결과 출력
+        return rankSort;
+    }
     public void writeLogFromExcelToMonth(FileDataDto fileDataDto,String fileName) {
         // 주소 분리,거래량 저장
         Map<String, Integer> saveData = new HashMap<>();
@@ -82,7 +123,6 @@ public class WriteService {
         saveData.remove("X");
         XSSFWorkbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("data");
-
         int nowRow = 1;
         Row initrow = sheet.createRow(0);
         // 지역

@@ -12,7 +12,7 @@ public class KmpSearch {
     private KmpSearch() {};
 
     //대한민국 시 선언
-    private static final List<String> CITIES = new ArrayList<>(Arrays.asList(
+    public static final List<String> CITIES = new ArrayList<>(Arrays.asList(
             "서산시", "나주시", "세종특별자치시", "하남시", "광명시", "당진시", "삼척시", "인천광역시","안성시","영천시","부천시","상주시","통영시","김해시",
             "광주광역시", "평택시", "포천시", "여주시", "울산광역시", "의왕시", "김제시", "안동시","대구광역시","오산시","양주시","김천시","과천시","동해시",
             "목포시", "충주시", "군산시", "속초시", "동두천시", "순천시", "강릉시", "여수시", "남양주시","계룡시","정읍시","익산시","화성시","남원시",
