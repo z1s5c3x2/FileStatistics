@@ -34,49 +34,54 @@ public class KmpSearch {
         {
             initPatternIndex();
         }
-
+        // 전국 시 리스트를 저장, 문자열을 탐색할때 2개의 문자열을 비교할때
+        // 패턴 테이블을 만들어 불일치가 일어나기 까지의 일치한 이전 문자열은 계산하지 않는다
         for(String __city : CITIES)
         {
             if(KMP(_address,__city))
             {
                 return __city;
             }
+            System.out.println(_address);
         }
         return "X";
     }
 
     private int[] getPi(String pattern) {
-        int j = 0;
-        int[] pi = new int[pattern.length()];
-        for (int i = 1; i < pattern.length(); i++) {
-            // 맞는 위치가 나올 때까지 j - 1칸의 공통 부분 위치로 이동
-            while(j > 0 && pattern.charAt(i) != pattern.charAt(j)){
-                j = pi[j - 1];
+        int leftIdx = 0;
+        int[] pi = new int[pattern.length()]; // 패턴의 길이만큼 테이블 생성 , int의 기본값인 0으로 초기화
+        //패턴의 길이만큼 순회
+        for (int rightIdx = 1; rightIdx < pattern.length(); rightIdx++) {
+            // 왼쪽의 인덱스가 0보다 크고 왼쪽 인덱스의 문자와 오른쪽 인덱스의 문자가 같지 않으면 문자가 일치 할 때 까지 
+            // 왼쪽의 인덱스를 현재 인덱스를  현재 인덱스 위치의 이전의 pi의 값으로 초기화 한다
+            while(leftIdx > 0 && pattern.charAt(rightIdx) != pattern.charAt(leftIdx)){
+                leftIdx = pi[leftIdx - 1];
             }
-            // 맞는 경우
-            if(pattern.charAt(i) == pattern.charAt(j)) {
-                //i길이 문자열의 공통 길이는 j의 위치 + 1
-                pi[i] = ++j;
+            // 왼쪽 인덱스의 문자와 오른쪽 인덱스의 문자가 일치한다면 pi 오른쪽 인덱스 위치에 왼쪽 인덱스를 +1 해주고
+            // pi 오른쪽 인덱스에 저장한다
+            if(pattern.charAt(rightIdx) == pattern.charAt(leftIdx)) {
+                pi[rightIdx] = ++leftIdx;
             }
         }
         return pi;
     }
 
     private boolean KMP(String address,String city) {
-        int j = 0;
-        for (int i = 0; i < address.length(); i++) {
-            // 맞는 위치가 나올 때까지 j - 1칸의 공통 부분 위치로 이동
-            while(j > 0 && address.charAt(i) != city.charAt(j)) {
-                j = CITTES_PATTTERN.get(city)[j - 1];
+        //위 주석 참조
+        int leftIdx = 0;
+        for (int rightIdx = 0; rightIdx < address.length(); rightIdx++) {
+            while(leftIdx > 0 && address.charAt(rightIdx) != city.charAt(leftIdx)) {
+                leftIdx = CITTES_PATTTERN.get(city)[leftIdx - 1];
             }
-
-            if(address.charAt(i) == city.charAt(j)) {
-                if(j == city.length() - 1) {
+            
+            if(address.charAt(rightIdx) == city.charAt(leftIdx)) {
+                //양쪽 인덱스의 문자가 같고 왼쪽 인덱스가 city의 길이-1만큼 일치한다면 문자열 일치,true리턴 
+                if(leftIdx == city.length() - 1) {
                     return true;
                 }
-                //맞았지만 패턴이 끝나지 않았다면 j를 하나 증가
+                // 문자가 같지만 완전 일치가 아닌경우 인덱스 1 증가
                 else
-                    ++j;
+                    ++leftIdx;
             }
         }
         return false;
