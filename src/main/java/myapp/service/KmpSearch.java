@@ -42,7 +42,6 @@ public class KmpSearch {
             {
                 return __city;
             }
-            System.out.println(_address);
         }
         return "X";
     }
