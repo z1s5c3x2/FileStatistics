@@ -26,7 +26,7 @@ public class WriteService {
         /*형식 지정*/
         Row initRow = sheet.createRow(0);
         Cell initCell = initRow.createCell(0);
-        initCell.setCellValue("월");
+        initCell.setCellValue("날짜");
         initCell = initRow.createCell(1);
         initCell.setCellValue("거래량");
         initCell = initRow.createCell(2);
