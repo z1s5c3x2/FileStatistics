@@ -1,11 +1,13 @@
 package myapp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import myapp.model.ExcelDataDto;
 import myapp.model.FileDataDto;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
@@ -20,7 +22,8 @@ public class WriteService {
     private WriteService() {}
 
     public void writeLogFromExcelToYear(HashMap<String, FileDataDto> stringFileDataDtoHashMap) {
-        Workbook wb = new XSSFWorkbook();
+
+        SXSSFWorkbook wb = new SXSSFWorkbook();
         Sheet sheet = wb.createSheet("year");
 
         /*형식 지정*/

@@ -1,5 +1,6 @@
 package myapp.service;
 
+import com.github.pjfanning.xlsx.StreamingReader;
 import myapp.model.ExcelDataDto;
 import myapp.model.ExcelReadOnlyDto;
 import myapp.model.FileDataDto;
@@ -12,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.core.io.ClassPathResource;
+import org.yaml.snakeyaml.reader.StreamReader;
 
 
 import javax.annotation.security.RunAs;
@@ -81,15 +83,14 @@ public class ReadService {
 
         try {
             InputStream ins = cpr.getInputStream();
-            XSSFWorkbook wb = new XSSFWorkbook(ins);
-            ins.close();
+            Workbook wb = StreamingReader.builder().bufferSize(4096).open(ins);
 
             FileDataDto fileDataDto = FileDataDto.builder()
                     .startRow(16)
                     .maxRow(wb.getSheetAt(0).getLastRowNum())
                     .build();
             
-            XSSFSheet sheet = wb.getSheetAt(0);
+            Sheet sheet = wb.getSheetAt(0);
             wb.close();
 
             ExecutorService threadPool = new ThreadPoolExecutor(
@@ -123,7 +124,7 @@ public class ReadService {
     }
 
 
-    private void readFile(FileDataDto fdt,int start,int end,XSSFSheet sheet)
+    private void readFile(FileDataDto fdt,int start,int end,Sheet sheet)
     {
         try {
             //System.out.println(", start = " + start + ", end = " + end);
