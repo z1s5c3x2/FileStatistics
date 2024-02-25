@@ -69,16 +69,18 @@ public class WriteService {
         }
 
     }
+
+
     public Map<String,Float> choiceCityInMere(HashMap<String, FileDataDto> stringFileDataDtoHashMap,String target)
     {
         //System.out.println("target = " + target);
         HashMap<String,int[]> mereCount = new HashMap<>();
         HashMap<String,Float> mereInfo = new HashMap<>();
-
         for(Map.Entry<String,FileDataDto> entry : stringFileDataDtoHashMap.entrySet())
         {
             for(ExcelDataDto _dto : entry.getValue().getRowList())
             {
+
                 String _city =KmpSearch.getInstance().kmpSearch(_dto.getAddress1());
                 if(_city.equals(target))
                 {

@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly 'org.projectlombok:lombok'
@@ -26,7 +27,8 @@ dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
 
     implementation 'com.github.pjfanning:excel-streaming-reader:4.2.1'
-
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
 }
 
 tasks.named('test') {
